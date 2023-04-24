@@ -1,21 +1,31 @@
-image: python
+name: CI
 
-stages:
-- build
-- test
-- deploy
+on:
+   push:
+    branches: [ "master" ]
+    pull_request:
+      branches: [ "master" ]
+ 
+   workflow_dispatch:
+ 
+   jobs:
+    build-job:
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v3
+       - run: python3 -V
+ 
+   test-job:
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v3
+         - run: python3 -V
+         
+   deploy-job:
+      runs-on: ubuntu-latest
+      steps:
+         - uses: actions/checkout@v3
+         - run: echo "Finalizado"
+         
 
-build-job:
-stage: build
-script:
-- python3 -V
 
-test-cout:
-stage: test
-script:
-- python3 [sum.py](http://sum.py/)
-
-deploy-job:
-stage: deploy
-script:
-- echo "Terminou :)"
