@@ -1,0 +1,23 @@
+language: python
+
+services:
+  - docker
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y telegram-send
+
+script:
+  - python test.py
+
+after_success:
+  - docker build -t username/repo:tag .
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker push username/repo:tag
+  - telegram-send --config telegram-send.conf "Build succeeded! Docker image pushed to Docker Hub."
+
+after_failure:
+  - telegram-send --config telegram-send.conf "Build failed!"
+
+notifications:
+  email: false
