@@ -1,35 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+
 jobs:
-   build-job:
-     runs-on: ubuntu-latest
-     steps:
-       - uses: actions/checkout@v3
-       - run: python3 -V
- 
-   test-job:
-      runs-on: ubuntu-latest
-      steps:
-         - uses: actions/checkout@v3
-         - run: python3 sum.py
-         
-   deploy-job:
-      runs-on: ubuntu-latest
-      steps:
-         - uses: actions/checkout@v3
-         - run: echo "Finalizado!"
-   
-   dast-job:
-      runs-on: ubuntu-latest
-      steps:
-         - name: Install OWASP ZAP
-           run: |
-             sudo apt-get update && sudo apt-get install -y default-jdk
-             wget https://github.com/zaproxy/zaproxy/releases/download/v2.10.0/ZAP_2.10.0_Linux.tar.gz
-             tar -xvf ZAP_2.10.0_Linux.tar.gz
-             sudo mv ZAP_2.10.0 /opt/
-             sudo ln -s /opt/ZAP_2.10.0/zap.sh /usr/bin/zap
-         - name: Run OWASP ZAP Scan
-           run: |
-             zap-baseline.py -t http://localhost:3000 -r report.html
-         - name: Send report to Telegram
-           run: |
-             telegram-send --config telegram-send.conf --file report.html
+  build-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup CodeQL
+        uses: github/codeql-action/setup@v2
+        with:
+          languages: python
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          # Path to your CodeQL queries
+          queries: ./path/to/your/queries
+          # Path to your CodeQL database
+          database-path: ./codeql-db
+          # Path to your source code
+          # You can also exclude some directories from the analysis using the `--exclude` flag
+          # (e.g., --exclude=tests,docs)
+          # You can also include additional directories using the `--include` flag
+          # (e.g., --include=path/to/other/code)
+          # For more information, see the CodeQL CLI documentation: https://help.semmle.com/codeql/codeql-cli/reference/analyze-command.html
+          # Note: If you're analyzing a private repository, make sure to include a CodeQL secret
+          # For more information, see the CodeQL Action documentation: https://github.com/github/codeql-action#specifying-a-codeql-secret
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  test-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: python3 sum.py
+
+  deploy-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo "Finalizado!"
