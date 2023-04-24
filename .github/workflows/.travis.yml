@@ -17,7 +17,7 @@ script:
 after_success:
   - docker build -t femiranda/repo:tag .
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push femiranda/repo:tag
+  - docker push femiranda/devopspuc:latest
   - telegram-send --config telegram-send.conf "Build succeeded! Docker image pushed to Docker Hub."
 
 after_failure:
